@@ -6,9 +6,6 @@
 import tweepy
 
 
-app = Flask(__name__) # create the application instance :)
-app.config.from_object(__name__) # load config from this file , tweetmap.py
-
 # In[9]:
 
 auth = tweepy.OAuthHandler('uJ8ywVGKTC7aubwomDuWrAu9t', 'qbcDPiGjdNGj3B2EiXja3z0ppxMenePTzp6X1nAur2CakwLF1G')
