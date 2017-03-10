@@ -1,21 +1,3 @@
-Skip to content
-This repository
-Search
-Pull requests
-Issues
-Gist
- @guptakanksha1992
- Sign out
- Watch 2
-  Star 0
- Fork 0 nyletara/TwitterMap
- Code  Issues 0  Pull requests 0  Projects 0  Wiki  Pulse  Graphs
-Branch: master Find file Copy pathTwitterMap/eb-flask/static/css/bootstrap.css
-a8e8fe3  on Oct 24, 2016
-@nyletara nyletara Refactored structure to render all front-end services via Flask
-1 contributor
-RawBlameHistory
-7467 lines (7466 sloc)  161 KB
 @import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500,700");
 /*!
  * bootswatch v3.3.7
@@ -7482,5 +7464,3 @@ input[type="checkbox"]:disabled:checked:after,
 .carousel-caption h6 {
   color: inherit;
 }
-Contact GitHub API Training Shop Blog About
-© 2017 GitHub, Inc. Terms Privacy Security Status Help
