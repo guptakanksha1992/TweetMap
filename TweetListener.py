@@ -1,13 +1,9 @@
 import tweepy
 import json
-import ConfigParser
 from tweepy import Stream
 from tweepy.streaming import StreamListener
 from TweetHandler import TwitterHandler
 from ElasticSearchServices import ElasticSearchServices
-
-# config = ConfigParser.ConfigParser()
-# config.readfp(open(r'./configurations.txt'))
 
 consumerKey='uJ8ywVGKTC7aubwomDuWrAu9t'
 consumerSecret='qbcDPiGjdNGj3B2EiXja3z0ppxMenePTzp6X1nAur2CakwLF1G'
@@ -82,15 +78,15 @@ def parse_data(data):
         longitude = 0;
         latitude = 0;
         for object in coord_array:
-            # print(object)
             longitude = longitude + object[0]
             latitude = latitude + object[1]
-        # print(longitude / len(coord_array))
-        # print(latitude / len(coord_array))
+
 
         final_longitude = longitude / len(coord_array)
         final_latitude = latitude / len(coord_array)
-
+    else:
+        final_longitude=0.135916
+        final_latitude=52.200974
     tweetId = json_data_file['id_str']
     tweet = json_data_file["text"]
     author = json_data_file["user"]["name"]
