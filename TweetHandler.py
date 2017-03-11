@@ -20,7 +20,7 @@ class TwitterHandler:
 
 		size = 10000
 		result = self.es.search(self.index, self.doc_type, body, size)
-
+		print 'hey i am akanksha '+result
 		return result
 
 	def getTweetsWithDistance(self, keyword, distance, latitude, longitude):
