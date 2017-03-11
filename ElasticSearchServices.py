@@ -5,7 +5,6 @@ from elasticsearch import Elasticsearch
 # Our elastic search engine
 HOSTADDRESS='search-tweetmap-whpei25apwtxe7bvkmaj34ozee.us-west-1.es.amazonaws.com'
 
-
 class ElasticSearchServices:
 
     def __init__(self):
