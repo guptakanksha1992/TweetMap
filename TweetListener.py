@@ -4,6 +4,10 @@ from tweepy import Stream
 from tweepy.streaming import StreamListener
 from TweetHandler import TwitterHandler
 from ElasticSearchServices import ElasticSearchServices
+import random
+
+
+#----------Twitter API Details---------------------------
 
 consumerKey='uJ8ywVGKTC7aubwomDuWrAu9t'
 consumerSecret='qbcDPiGjdNGj3B2EiXja3z0ppxMenePTzp6X1nAur2CakwLF1G'
@@ -13,6 +17,9 @@ accessSecret='lrJiIAcGZRvxPNTTvo5TCe3KRJp6FaqNZGIOC0SSOHLsx'
 KEYWORDS = ['Food', 'Travel', 'Hollywood', 'Art', 'Cartoons', 'Pizza', 'Friends', 'Miami']
 REQUEST_LIMIT = 420
 
+#---- Elastic Search Details -------
+
+index = "finaltwittermapindex5"
 collection = {
 	"mappings": {
 		"finaltweets2": {
@@ -37,7 +44,9 @@ collection = {
 	}
 }
 
-index = "finaltwittermapindex5"
+#--------------------------------------------------------
+
+
 try:
     collection_service = ElasticSearchServices()
     collection_service.create_collection(index, collection)
@@ -85,8 +94,12 @@ def parse_data(data):
         final_longitude = longitude / len(coord_array)
         final_latitude = latitude / len(coord_array)
     else:
-        final_longitude=0.135916
-        final_latitude=52.200974
+
+    	# Insert code for random final_longitude, final_latitude here
+
+        final_longitude=random.uniform(-180.0,180.0)
+        final_latitude=random.uniform(-90.0, +90.0)
+        
     tweetId = json_data_file['id_str']
     tweet = json_data_file["text"]
     author = json_data_file["user"]["name"]

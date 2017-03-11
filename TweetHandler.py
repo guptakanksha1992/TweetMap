@@ -25,7 +25,7 @@ class TwitterHandler:
 
 	def getTweetsWithDistance(self, keyword, distance, latitude, longitude):
 		distance_string = distance + 'km'
-		print distance_string
+		print 'Searching ', distance_string, ' from location Latitude: ', latitude, ' ; Longitude: ', longitude
 		body = {
 			"query": {
 				"match": {
@@ -45,18 +45,15 @@ class TwitterHandler:
 		}
 
 		size = 10000
-		result = self.es.search(self.index, self.doc_type, body, size)
+		result = self.es.search(self.index, body)
 
 		return result
 
 	def insertTweet(self, id, location_data, tweet, author, timestamp):
-		print "!!!!!!!!!!!!!!!!"
-		print id
-		print tweet
-		print author
-		print timestamp
-		print location_data[0]
-		print location_data[1]
+		#print "Inserting the follwing tweet: "
+		# print id
+		#print tweet
+		#print author, timestamp, location_data[0], location_data[1]
 		body = {
 			"id": id,
 			"message": tweet,

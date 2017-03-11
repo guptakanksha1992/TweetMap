@@ -86,7 +86,7 @@ function get_type(thing){
 function search_by_geo_distance(latitude, longitude) {
 	clearMarkers();
     var selected_key = $('#selected_keyword').value;
-	var selected_dist = $('#selected_distance').value;
+	  var selected_dist = $('#selected_distance').value;
     //Here is where the ajax call is made i.e. where we then call the endpoint associated with the search function
 	console.log(selected_distance.value);
 	$.ajax({

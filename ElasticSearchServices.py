@@ -1,17 +1,22 @@
 # This is the file where we connect to ES + find and insert data
 
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, RequestsHttpConnection
+from requests_aws4auth import AWS4Auth
 
 # Our elastic search engine
 HOSTADDRESS='search-tweetmap-whpei25apwtxe7bvkmaj34ozee.us-west-1.es.amazonaws.com'
+awsauth = AWS4Auth('AKIAINHSJW74HQTPGTYQ', 'ROcOAC4P3iJ4pkX1ySJjDNJfvTzmLFFqAcE7XW3l', "us-west-1", 'es')
 
 class ElasticSearchServices:
 
     def __init__(self):
         self.es = Elasticsearch(
-        		[HOSTADDRESS]
-
-        	)
+            hosts=[{'host': HOSTADDRESS, 'port': 443}],
+            http_auth=awsauth,
+            use_ssl=True,
+            verify_certs=True,
+            connection_class=RequestsHttpConnection
+        )
 
     def store_data(self, index, doc_type, body):
         results = self.es.index(
@@ -26,6 +31,7 @@ class ElasticSearchServices:
         print ("Creating collection...")
         results = self.es.indices.create(
             index=index,
+            ignore=400,
             body=body
         )
         return results
@@ -38,7 +44,7 @@ class ElasticSearchServices:
     			size = size
     		)
 
-    	return results;
+    	return results
 
     def total_hits(results):
     	return results['hits']['total']
