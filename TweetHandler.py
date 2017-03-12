@@ -53,7 +53,7 @@ class TwitterHandler:
 		body = 	{
 				    "query": {
 				        "bool": {
-				            "should": {
+				            "must": {
 				                "match": {"message": keyword}
 				            },
 				        	"filter": {
