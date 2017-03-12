@@ -26,7 +26,7 @@ class TwitterHandler:
 	def getTweetsWithDistance(self, keyword, distance, latitude, longitude):
 		distance_string = distance + 'km'
 		print 'Searching ', distance_string, ' from location Latitude: ', latitude, ' ; Longitude: ', longitude
-		body = {
+		'''body = {
 			"query": {
 				"match": {
 					"_all": keyword
@@ -42,20 +42,46 @@ class TwitterHandler:
 					}
 				}
 			}
-		}
+		}'''
+
+		if (type(latitude) != float):
+			latitude = float(latitude)
+
+		if (type(longitude) != float):
+			longitude = float(longitude)
+
+		body = 	{
+				    "query": {
+				        "bool": {
+				            "should": {
+				                "match": {"message": keyword}
+				            },
+				        	"filter": {
+								"geo_distance": {
+									"distance": distance_string,
+									"distance_type": "sloppy_arc",
+									"location": {
+										"lat": latitude,
+										"lon": longitude
+									}
+								}
+							}
+					    }
+				    }            
+				}
 
 		size = 10000
-		result = self.es.search(self.index, body)
+		result = self.es.search(self.index, self.doc_type, body, size)
 
 		return result
 
-	def insertTweet(self, id, location_data, tweet, author, timestamp):
+	def insertTweet(self, t_id, location_data, tweet, author, timestamp):
 		#print "Inserting the follwing tweet: "
 		# print id
 		#print tweet
 		#print author, timestamp, location_data[0], location_data[1]
 		body = {
-			"id": id,
+			"id": t_id,
 			"message": tweet,
 			"author": author,
 			"timestamp": timestamp,
