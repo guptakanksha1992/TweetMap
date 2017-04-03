@@ -14,7 +14,8 @@ consumerSecret='qbcDPiGjdNGj3B2EiXja3z0ppxMenePTzp6X1nAur2CakwLF1G'
 accessToken='3287103102-m7iUaz9H6eOmgl50DBMXPfePIywVFEnYldLAUoa'
 accessSecret='lrJiIAcGZRvxPNTTvo5TCe3KRJp6FaqNZGIOC0SSOHLsx'
 
-KEYWORDS = ['Food', 'Travel', 'Hollywood', 'Art', 'Cartoons', 'Pizza', 'Friends', 'Miami']
+KEYWORDS = ['Food', 'Travel', 'Hollywood', 'Art', 'Cartoons', 'Pizza', 'Friends', 'Miami', 'Popatlal']
+#KEYWORDS = ['Popatlal']
 REQUEST_LIMIT = 420
 
 #---- Elastic Search Details -------
@@ -72,11 +73,16 @@ class TweetListener(StreamListener):
             exit()
 
 def parse_data(data):
+    #print 'Data received at parse_data', data
     json_data_file = json.loads(data)
+    # Could be that json.loads has failed
     tweetHandler = TwitterHandler()
 
     location = json_data_file["place"]
     coordinates = json_data_file["coordinates"]
+
+    '''print 'Value of location', location
+                print 'Value of coordinates', coordinates'''
 
     if coordinates is not None:
         # print(json_data_file["coordinates"])
@@ -106,10 +112,15 @@ def parse_data(data):
     timestamp = json_data_file["created_at"]
 
     location_data = [final_longitude, final_latitude]
-    try:
-        print(tweetHandler.insertTweet(tweetId, location_data, tweet, author, timestamp))
-    except:
-        print("Failed to insert tweet")
+    tweetHandler.insertTweet(tweetId, location_data, tweet, author, timestamp)
+    #try:
+    	#print 'Trying to insert tweet', tweet, 'from TweetListener'
+        #print(tweetHandler.insertTweet(tweetId, location_data, tweet, author, timestamp))
+    #except:
+    #	print('F')
+        #print("Failed to insert tweet")
+
+    #print '---------------'
 
 def startStream():
 

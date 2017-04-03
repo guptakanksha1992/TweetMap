@@ -54,7 +54,7 @@ class TwitterHandler:
 				    "query": {
 				        "bool": {
 				            "must": {
-				                "match": {"message": keyword}
+				                "match": {"_all": keyword}
 				            },
 				        	"filter": {
 								"geo_distance": {
@@ -72,11 +72,15 @@ class TwitterHandler:
 
 		size = 10000
 		result = self.es.search(self.index, self.doc_type, body, size)
-
+		#print 'Result found:', result
 		return result
 
 	def insertTweet(self, t_id, location_data, tweet, author, timestamp):
 		#print "Inserting the follwing tweet: "
+		print author
+		if (author == 'Clumsy Ninja'):
+			print tweet
+			print '-----------'
 		# print id
 		#print tweet
 		#print author, timestamp, location_data[0], location_data[1]
