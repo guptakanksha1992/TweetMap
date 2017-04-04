@@ -6,7 +6,7 @@ class TwitterHandler:
 
 	def __init__(self):
 		self.es = ElasticSearchServices()
-		self.index = "finaltwittermapindex5"
+		self.index = "tweettrends"
 		self.doc_type = "finaltweets2"
 
 	def getTweets(self, keyword):
@@ -54,7 +54,7 @@ class TwitterHandler:
 				    "query": {
 				        "bool": {
 				            "must": {
-				                "match": {"_all": keyword}
+				                "match": {"_all": keyword }
 				            },
 				        	"filter": {
 								"geo_distance": {
@@ -72,15 +72,11 @@ class TwitterHandler:
 
 		size = 10000
 		result = self.es.search(self.index, self.doc_type, body, size)
-		#print 'Result found:', result
+
 		return result
 
-	def insertTweet(self, t_id, location_data, tweet, author, timestamp):
+	def insertTweet(self, t_id, location_data, tweet, author, timestamp, sentimentRating,anger, joy, sadness, fear, disgust ):
 		#print "Inserting the follwing tweet: "
-		print author
-		if (author == 'Clumsy Ninja'):
-			print tweet
-			print '-----------'
 		# print id
 		#print tweet
 		#print author, timestamp, location_data[0], location_data[1]
@@ -89,7 +85,13 @@ class TwitterHandler:
 			"message": tweet,
 			"author": author,
 			"timestamp": timestamp,
-			"location": location_data
+			"location": location_data,
+			"sentiment": sentimentRating,
+			"anger": anger,
+			"joy":joy,
+			"sadness":sadness,
+			"fear": fear,
+			"disgust": disgust
 		}
 
 		result = self.es.store_data(self.index, self.doc_type, body)

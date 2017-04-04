@@ -3,10 +3,19 @@
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
 
-# Our elastic search engine
-HOSTADDRESS='search-tweetmap-whpei25apwtxe7bvkmaj34ozee.us-west-1.es.amazonaws.com'
-awsauth = AWS4Auth('AKIAINHSJW74HQTPGTYQ', 'ROcOAC4P3iJ4pkX1ySJjDNJfvTzmLFFqAcE7XW3l', "us-west-1", 'es')
 
+
+myvars = {}
+with open("aws_auth.txt") as myfile:
+    for line in myfile:
+        name, var = line.partition(":")[::2]
+        myvars[name.strip()] = var.strip()
+
+# Our elastic search engine
+
+HOSTADDRESS=myvars['elastic_search_host_address']
+
+awsauth = AWS4Auth(myvars['aws_api_key'], myvars['aws_secret'], "us-east-1", 'es')
 class ElasticSearchServices:
 
     def __init__(self):
