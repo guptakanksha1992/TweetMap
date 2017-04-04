@@ -1,21 +1,24 @@
 # This is the file where we connect to ES + find and insert data
 
-from elasticsearch import Elasticsearch, RequestsHttpConnection
-from requests_aws4auth import AWS4Auth
-
-
+#----------Parsing Configuration File--------------------
 
 myvars = {}
-with open("aws_auth.txt") as myfile:
+with open("auth.txt") as myfile:
     for line in myfile:
         name, var = line.partition(":")[::2]
         myvars[name.strip()] = var.strip()
+
+#---------Import Elastic Search libraries----------------
+
+from elasticsearch import Elasticsearch, RequestsHttpConnection
+from requests_aws4auth import AWS4Auth
 
 # Our elastic search engine
 
 HOSTADDRESS=myvars['elastic_search_host_address']
 
 awsauth = AWS4Auth(myvars['aws_api_key'], myvars['aws_secret'], "us-east-1", 'es')
+
 class ElasticSearchServices:
 
     def __init__(self):
