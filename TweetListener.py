@@ -33,8 +33,7 @@ from boto.sqs.message import Message
 KEYWORDS = ['Food', 'Travel', 'Hollywood', 'Art', 'Cartoons', 'Pizza', 'Friends', 'Miami']
 REQUEST_LIMIT = 420
 
-conn = boto.sqs.connect_to_region("us-west-2", aws_access_key_id=myvars['aws_api_key'],
-                                  aws_secret_access_key=myvars['aws_secret'])
+
 class TweetListener(StreamListener):
     def on_data(self, data):
         try:
@@ -124,7 +123,8 @@ def parse_data(data):
 
 def publishToQueue(tweet):
     # Establishing Connection to SQS
-
+    conn = boto.sqs.connect_to_region("us-west-2", aws_access_key_id=myvars['aws_api_key'],
+                                      aws_secret_access_key=myvars['aws_secret'])
     q = conn.get_queue('tweet_queue')   # Connecting to the SQS Queue named tweet_queue
 
     m = Message()                       # Creating a message Object
