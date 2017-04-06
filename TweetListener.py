@@ -13,6 +13,7 @@ import json
 from tweepy import Stream
 from tweepy.streaming import StreamListener
 
+
 consumerKey=myvars['twitter_consumer_key']
 consumerSecret=myvars['twitter_consumer_secret']
 accessToken=myvars['twitter_access_token']
@@ -47,8 +48,18 @@ class TweetListener(StreamListener):
             print("Request limit reached. Trying again...")
             exit()
 
+
+def formatTweet(id, location_data, tweet, author, timestamp):
+    tweet = {
+        "id": id,
+        "message": tweet,
+        "author": author,
+        "timestamp": timestamp,
+        "location": location_data
+    }
+    return tweet
+
 def parse_data(data):
-    print 'RAW DATA:',data  
     try:
     	json_data_file = json.loads(data)
     except Exception, e:
@@ -56,7 +67,7 @@ def parse_data(data):
     	print e
     # Could be that json.loads has failed
 
-    print 'JSON DATA FILE:', json_data_file
+    #print 'JSON DATA FILE:', json_data_file
 
     try:
         location = json_data_file["place"]
@@ -81,6 +92,7 @@ def parse_data(data):
         final_latitude = latitude / len(coord_array)
     else:
     	# Insert code for random final_longitude, final_latitude here
+
         final_longitude=random.uniform(-180.0,180.0)
         final_latitude=random.uniform(-90.0, +90.0)
         
@@ -91,47 +103,21 @@ def parse_data(data):
     location_data = [final_longitude, final_latitude]
 
     # Tweet ready (without sentiment analysis by this point) - sending to queue
-
-    print tweetId, location_data, tweet, author, timestamp
+   # print tweetId, location_data, tweet, author, timestamp
 
     try:
+        # Format tweet into correct message format for SQS
+        formatted_tweet = formatTweet(tweetId, location_data, tweet, author, timestamp)
+        tweet = json.dumps(formatted_tweet)
     	print 'Trying to publish to Queue the tweet', tweet
-    	publishToQueue(tweetId, location_data, tweet, author, timestamp)
+        queue_name = conn.getQueueName('tweet_queue')
+        response = queue_name.send_message(MessageBody=tweet)
+        print(type(response))
+        print("Added tweet to SQS")
+
     except Exception, e:
-    	print("Failed to insert tweet")
+    	print("Failed to insert tweet into SQS")
     	print str(e)
-
-def publishToQueue(tweetId, location_data, tweet, author, timestamp):
-	print 'In publishToQueue'
-	q = conn.get_queue('tweet_queue')   # Connecting to the SQS Queue named tweet_queue
-	m = Message()                       # Creating a message Object
-	m.message_attributes = {
-	    "id": {
-	     "data_type": "String",
-	     "string_value": str(tweetId)
-	     },
-	     "author": {
-	         "data_type": "String",
-	         "string_value": str(author)
-	     },
-	     "timestamp": {
-	         "data_type": "String",
-	         "string_value": str(timestamp)
-	     },
-	     "location": {
-	        "data_type": "String",
-	        "string_value": str(location_data)
-	     }
-	 }
-
-	print 'Saving', tweet, 'as message body'
-	m.set_body(tweet)
-
-	try:
-	    q.write(m)
-	except Exception,e:
-	    print 'Failed to publish to Queue'
-	    print str(e)
 
 def startStream():
     auth = tweepy.OAuthHandler(consumerKey, consumerSecret)
