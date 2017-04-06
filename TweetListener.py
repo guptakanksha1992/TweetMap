@@ -110,7 +110,7 @@ def parse_data(data):
         formatted_tweet = formatTweet(tweetId, location_data, tweet, author, timestamp)
         tweet = json.dumps(formatted_tweet)
     	print 'Trying to publish to Queue the tweet', tweet
-        queue_name = conn.getQueueName('tweet_queue')
+        queue_name = conn.get_queue_by_name('tweet_queue')
         response = queue_name.send_message(MessageBody=tweet)
         print(type(response))
         print("Added tweet to SQS")
