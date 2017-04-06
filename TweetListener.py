@@ -18,14 +18,15 @@ consumerSecret=myvars['twitter_consumer_secret']
 accessToken=myvars['twitter_access_token']
 accessSecret=myvars['twitter_access_secret']
 
+
+#----------Sentiment Analysis methods------------------
+
+from TweetSentimentAnalysis import *
+
 #----------SQS Details---------------------------
 
 import boto.sqs
 from boto.sqs.message import Message
-
-# Establishing Connection to SQS
-conn = boto.sqs.connect_to_region("us-west-2", aws_access_key_id=myvars['aws_api_key'], aws_secret_access_key=myvars['aws_secret'])
-
 
 KEYWORDS = ['Food', 'Travel', 'Hollywood', 'Art', 'Cartoons', 'Pizza', 'Friends', 'Miami']
 REQUEST_LIMIT = 420
@@ -103,6 +104,10 @@ def parse_data(data):
 
 def publishToQueue(tweetId, location_data, tweet, author, timestamp):
 	print 'In publishToQueue'
+
+    # Establishing Connection to SQS
+    conn = boto.sqs.connect_to_region("us-west-2", aws_access_key_id=myvars['aws_api_key'], aws_secret_access_key=myvars['aws_secret'])
+
 	q = conn.get_queue('tweet_queue')   # Connecting to the SQS Queue named tweet_queue
 	m = Message()                       # Creating a message Object
 	m.message_attributes = {
@@ -133,6 +138,35 @@ def publishToQueue(tweetId, location_data, tweet, author, timestamp):
 	    print 'Failed to publish to Queue'
 	    print str(e)
 
+def elastic_worker_sentiment_analysis():
+    # This method acts as an Elastic BeanStalk worker
+
+    # Receiving the message from SQS
+    q = conn.get_queue('tweet_queue')
+
+    # Storing the result set
+    rs = q.get_messages()
+
+    # Extracting the message from resultset
+    m = rs[0]
+
+    # Extracting tweet from message
+    tweet = m.get_body()
+
+    sentiment = tweet_sentiment_analysis(tweet)
+
+    # SNS Connection
+
+    conn = boto.sns.connect_to_region( 'us-west-2', aws_access_key_id=myvars['aws_api_key'], aws_secret_access_key=myvars['aws_secret'] )
+    topic = 'arn:aws:sns:us-west-2:708464623468:tweet_sentiment'
+
+    # Appending sentiment data to JSON Format of the message tweet
+    message_json =  json.loads(m)
+    message_json['sentiment'] = sentiment
+
+    # Publishing to SNS
+    print conn.publish(topic=topic,message = message_json)
+    
 def startStream():
     auth = tweepy.OAuthHandler(consumerKey, consumerSecret)
     auth.set_access_token(accessToken, accessSecret)

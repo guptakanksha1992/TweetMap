@@ -24,14 +24,14 @@ def sentimentAnalysis(text):
         text=text,
         features=[features.Emotion(), features.Sentiment()])
     # print text
-    emotion_dict = response['emotion']['document']['emotion']
+    # emotion_dict = response['emotion']['document']['emotion']
     overall_sentiment = response['sentiment']['document']['label']
 
     # print ("The overall sentiment of the text is: "+overall_sentiment)
     # print("The emotional quotient of the text is as follows: ")
     # for key in emotion_dict:
     #     print(key + " : " + str(emotion_dict[key]))
-    return overall_sentiment, emotion_dict
+    return overall_sentiment
 
 def clean_tweet(tweet):
     '''
@@ -42,10 +42,6 @@ def clean_tweet(tweet):
 
 def tweet_sentiment_analysis(tweet):
     cleansed_tweet = clean_tweet(tweet)
-    sentimentRating, allemotions = sentimentAnalysis(cleansed_tweet)
-    anger = allemotions['anger']
-    joy = allemotions['joy']
-    sadness = allemotions['sadness']
-    fear = allemotions['fear']
-    disgust = allemotions['disgust']
+    sentimentRating = sentimentAnalysis(cleansed_tweet)
+    return sentimentRating
     

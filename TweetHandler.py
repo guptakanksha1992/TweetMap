@@ -75,7 +75,7 @@ class TwitterHandler:
 
 		return result
 
-	def insertTweet(self, t_id, location_data, tweet, author, timestamp, sentimentRating,anger, joy, sadness, fear, disgust ):
+	def insertTweet(self, t_id, location_data, tweet, author, timestamp, sentimentRating ):
 		#print "Inserting the follwing tweet: "
 		# print id
 		#print tweet
@@ -86,12 +86,7 @@ class TwitterHandler:
 			"author": author,
 			"timestamp": timestamp,
 			"location": location_data,
-			"sentiment": sentimentRating,
-			"anger": anger,
-			"joy":joy,
-			"sadness":sadness,
-			"fear": fear,
-			"disgust": disgust
+			"sentiment": sentimentRating
 		}
 
 		result = self.es.store_data(self.index, self.doc_type, body)

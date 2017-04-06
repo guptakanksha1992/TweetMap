@@ -27,21 +27,6 @@ collection = {
 				},
                 "sentiment": {
 					"type": "string"
-				},
-                "anger": {
-					"type": "float"
-				},
-                "joy": {
-					"type": "float"
-				},
-                "sadness": {
-					"type": "float"
-				},
-                "fear": {
-					"type": "float"
-				},
-                "disgust": {
-					"type": "float"
 				}
 			}
 		}
