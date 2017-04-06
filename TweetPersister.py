@@ -10,9 +10,6 @@ collection = {
 				"id": {
 					"type": "string"
 				},
-                "source": {
-					"type": "string"
-				},
 				"message": {
 					"type": "string"
 				},

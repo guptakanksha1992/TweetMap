@@ -33,10 +33,13 @@ from boto.sqs.message import Message
 KEYWORDS = ['Food', 'Travel', 'Hollywood', 'Art', 'Cartoons', 'Pizza', 'Friends', 'Miami']
 REQUEST_LIMIT = 420
 
+conn = boto.sqs.connect_to_region("us-west-2", aws_access_key_id=myvars['aws_api_key'],
+                                  aws_secret_access_key=myvars['aws_secret'])
 class TweetListener(StreamListener):
     def on_data(self, data):
         try:
             parse_data(data)
+            elastic_worker_sentiment_analysis()
         except Exception,e:
             # print(data)
             print("No location data found" + e)
@@ -121,7 +124,6 @@ def parse_data(data):
 
 def publishToQueue(tweet):
     # Establishing Connection to SQS
-    conn = boto.sqs.connect_to_region("us-west-2", aws_access_key_id=myvars['aws_api_key'], aws_secret_access_key=myvars['aws_secret'])
 
     q = conn.get_queue('tweet_queue')   # Connecting to the SQS Queue named tweet_queue
 
@@ -141,6 +143,7 @@ def elastic_worker_sentiment_analysis():
     # This method acts as an Elastic BeanStalk worker
 
     # Receiving the message from SQS
+    conn = boto.sqs.connect_to_region("us-west-2", aws_access_key_id=myvars['aws_api_key'], aws_secret_access_key=myvars['aws_secret'])
     q = conn.get_queue('tweet_queue')
 
     # Storing the result set
@@ -165,6 +168,7 @@ def elastic_worker_sentiment_analysis():
 
     # Publishing to SNS
     print conn.publish(topic=topic,message = message_json)
+    print "Published to SNS"
 
 def startStream():
     auth = tweepy.OAuthHandler(consumerKey, consumerSecret)
