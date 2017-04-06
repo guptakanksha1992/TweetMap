@@ -19,14 +19,9 @@ consumerSecret=myvars['twitter_consumer_secret']
 accessToken=myvars['twitter_access_token']
 accessSecret=myvars['twitter_access_secret']
 
-#----------SQS Details---------------------------
+#----------SQS Details-------------------------
 
 import boto.sqs
-from boto.sqs.message import Message
-
-# Establishing Connection to SQS
-conn = boto.sqs.connect_to_region("us-west-2", aws_access_key_id=myvars['aws_api_key'], aws_secret_access_key=myvars['aws_secret'])
-
 
 KEYWORDS = ['Food', 'Travel', 'Hollywood', 'Art', 'Cartoons', 'Pizza', 'Friends', 'Miami']
 REQUEST_LIMIT = 420
@@ -110,6 +105,9 @@ def parse_data(data):
         formatted_tweet = formatTweet(tweetId, location_data, tweet, author, timestamp)
         tweet = json.dumps(formatted_tweet)
     	print 'Trying to publish to Queue the tweet', tweet
+        # Establishing Connection to SQS
+        conn = boto.sqs.connect_to_region("us-west-2", aws_access_key_id=myvars['aws_api_key'],
+                                          aws_secret_access_key=myvars['aws_secret'])
         queue_name = conn.get_queue_by_name('tweet_queue')
         response = queue_name.send_message(MessageBody=tweet)
         print(type(response))
