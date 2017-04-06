@@ -26,8 +26,6 @@ from TweetSentimentAnalysis import *
 #----------SQS Details---------------------------
 
 import boto.sqs
-#from boto.sqs.message import Message
-
 
 KEYWORDS = ['Food', 'Travel', 'Hollywood', 'Art', 'Cartoons', 'Pizza', 'Friends', 'Miami']
 REQUEST_LIMIT = 420
@@ -123,41 +121,6 @@ def parse_data(data):
     	print("Failed to insert tweet into SQS")
     	print str(e)
 
-def publishToQueue(tweetId, location_data, tweet, author, timestamp):
-	print 'In publishToQueue'
-
-    # Establishing Connection to SQS
-    conn = boto.sqs.connect_to_region("us-west-2", aws_access_key_id=myvars['aws_api_key'], aws_secret_access_key=myvars['aws_secret'])
-
-	q = conn.get_queue('tweet_queue')   # Connecting to the SQS Queue named tweet_queue
-	m = Message()                       # Creating a message Object
-	m.message_attributes = {
-	    "id": {
-	     "data_type": "String",
-	     "string_value": str(tweetId)
-	     },
-	     "author": {
-	         "data_type": "String",
-	         "string_value": str(author)
-	     },
-	     "timestamp": {
-	         "data_type": "String",
-	         "string_value": str(timestamp)
-	     },
-	     "location": {
-	        "data_type": "String",
-	        "string_value": str(location_data)
-	     }
-	 }
-
-	print 'Saving', tweet, 'as message body'
-	m.set_body(tweet)
-
-	try:
-	    q.write(m)
-	except Exception,e:
-	    print 'Failed to publish to Queue'
-	    print str(e)
 
 def elastic_worker_sentiment_analysis():
     # This method acts as an Elastic BeanStalk worker
