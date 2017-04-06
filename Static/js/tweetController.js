@@ -30,11 +30,20 @@ function load_tweet(list) {
 	*/
 }
 
+ /* */
 function drop_marker(latitude, longitude, source_object) {
 	var curr_lat_and_lng = {lat: latitude, lng: longitude};
+	var markerColor = '0000FF';
+    var markerImage = new google.maps.MarkerImage(
+        "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + markerColor,
+        new google.maps.Size(80, 400),
+        new google.maps.Point(0,0),
+        new google.maps.Point(10, 34));
 	var new_marker = new google.maps.Marker({
     	position: curr_lat_and_lng,
-    	map: map
+    	map: map,
+		title: "Tweets around this area",
+        icon: markerImage
   	});
   	new_marker.addListener('click', function() {
   		toggleMarker(source_object);

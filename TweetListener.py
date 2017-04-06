@@ -13,11 +13,11 @@ import json
 from tweepy import Stream
 from tweepy.streaming import StreamListener
 
+
 consumerKey=myvars['twitter_consumer_key']
 consumerSecret=myvars['twitter_consumer_secret']
 accessToken=myvars['twitter_access_token']
 accessSecret=myvars['twitter_access_secret']
-
 
 #----------Sentiment Analysis methods------------------
 
@@ -26,7 +26,8 @@ from TweetSentimentAnalysis import *
 #----------SQS Details---------------------------
 
 import boto.sqs
-from boto.sqs.message import Message
+#from boto.sqs.message import Message
+
 
 KEYWORDS = ['Food', 'Travel', 'Hollywood', 'Art', 'Cartoons', 'Pizza', 'Friends', 'Miami']
 REQUEST_LIMIT = 420
@@ -48,8 +49,18 @@ class TweetListener(StreamListener):
             print("Request limit reached. Trying again...")
             exit()
 
+
+def formatTweet(id, location_data, tweet, author, timestamp):
+    tweet = {
+        "id": id,
+        "message": tweet,
+        "author": author,
+        "timestamp": timestamp,
+        "location": location_data
+    }
+    return tweet
+
 def parse_data(data):
-    print 'RAW DATA:',data  
     try:
     	json_data_file = json.loads(data)
     except Exception, e:
@@ -57,7 +68,7 @@ def parse_data(data):
     	print e
     # Could be that json.loads has failed
 
-    print 'JSON DATA FILE:', json_data_file
+    #print 'JSON DATA FILE:', json_data_file
 
     try:
         location = json_data_file["place"]
@@ -82,6 +93,7 @@ def parse_data(data):
         final_latitude = latitude / len(coord_array)
     else:
     	# Insert code for random final_longitude, final_latitude here
+
         final_longitude=random.uniform(-180.0,180.0)
         final_latitude=random.uniform(-90.0, +90.0)
         
@@ -92,14 +104,23 @@ def parse_data(data):
     location_data = [final_longitude, final_latitude]
 
     # Tweet ready (without sentiment analysis by this point) - sending to queue
-
-    print tweetId, location_data, tweet, author, timestamp
+   # print tweetId, location_data, tweet, author, timestamp
 
     try:
+        # Format tweet into correct message format for SQS
+        formatted_tweet = formatTweet(tweetId, location_data, tweet, author, timestamp)
+        tweet = json.dumps(formatted_tweet)
     	print 'Trying to publish to Queue the tweet', tweet
-    	publishToQueue(tweetId, location_data, tweet, author, timestamp)
+        # Establishing Connection to SQS
+        conn = boto.sqs.connect_to_region("us-west-2", aws_access_key_id=myvars['aws_api_key'],
+                                          aws_secret_access_key=myvars['aws_secret'])
+        queue_name = conn.get_queue_by_name('tweet_queue')
+        response = queue_name.send_message(MessageBody=tweet)
+        print(type(response))
+        print("Added tweet to SQS")
+
     except Exception, e:
-    	print("Failed to insert tweet")
+    	print("Failed to insert tweet into SQS")
     	print str(e)
 
 def publishToQueue(tweetId, location_data, tweet, author, timestamp):
@@ -166,7 +187,7 @@ def elastic_worker_sentiment_analysis():
 
     # Publishing to SNS
     print conn.publish(topic=topic,message = message_json)
-    
+
 def startStream():
     auth = tweepy.OAuthHandler(consumerKey, consumerSecret)
     auth.set_access_token(accessToken, accessSecret)
