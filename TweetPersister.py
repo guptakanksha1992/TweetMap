@@ -1,5 +1,5 @@
 from ElasticSearchServices import ElasticSearchServices
-
+from TweetHandler import TwitterHandler
 #---- Elastic Search Details -------
 
 index = "tweettrends"
@@ -39,3 +39,15 @@ try:
 except:
     print "Index already created"
 
+def persistTweet(tweet):
+    tweeter = TwitterHandler()
+    json_msg = json.loads(tweet['Message'])
+    tid = json_msg['id']
+    location_data = json_msg['location']
+    message = json_msg['message']
+    author = json_msg['author']
+    timestamp = json_msg['timestamp']
+    sentiment = json_msg['sentiment']
+    
+    response = tweeter.insertTweet(tid, location_data, message, author, timestamp, sentiment)
+    return response
