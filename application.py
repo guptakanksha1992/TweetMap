@@ -4,7 +4,6 @@ from flask_socketio import SocketIO, send, emit
 from TweetListener import *
 from flask import Flask, render_template, jsonify, request
 from TweetHandler import TwitterHandler
-import requests
 import TweetPersister
 import time
 
@@ -46,18 +45,20 @@ def handle_json(json):
 # HTTP Endpoint for SNS
 @application.route('/search/sns', methods = ['GET', 'POST', 'PUT'])
 def snsFunction():
-    print "Request received", request.data
     try:
         # Notification received from SNS
         print 'Notification received from SNS'
-        notification = json.loads(request.data)
+        if(len(request.data)):
+            notification = json.loads(request.data)
+        else:
+            notification = request.form['hello']
     except:
         print("Unable to load request")
-        pass
+        pass 
 
     headers = request.headers.get('X-Amz-Sns-Message-Type')
     print(notification)
-
+            
     if headers == 'SubscriptionConfirmation' and 'SubscribeURL' in notification:
         url = requests.get(notification['SubscribeURL'])
         print(url) 
@@ -66,7 +67,9 @@ def snsFunction():
         TweetPersister.persistTweet(notification)
         socketio.emit('first', {'notification':'New Tweet!'})
     else: 
+        print 'Value of headers', headers
         print("Headers not specified")
+    return 'End point was accessed!'
  
 # run the app.
 if __name__ == "__main__":
@@ -80,5 +83,5 @@ if __name__ == "__main__":
     twitter_thread.daemon = True
     twitter_thread.start()
     
-    application.run()
+    application.run(host = '0.0.0.0', port=5000)
     #socketio.run(application, host = '0.0.0.0', port=5000)
