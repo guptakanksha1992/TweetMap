@@ -22,13 +22,43 @@ function load_tweet(list) {
 	for (var i = 0; i < object_list.length; i++) {
 		curr_latitude = object_list[i]._source.location[1];
 		curr_longitude = object_list[i]._source.location[0];
-		drop_marker(curr_latitude, curr_longitude, object_list[i]._source);
+
+    if(object_list[i]._source.sentiment == 'positive'){
+      drop_marker_green_sentiment(curr_latitude, curr_longitude, object_list[i]._source)
+    } else if(object_list[i]._source.sentiment == 'negative'){
+      drop_marker(curr_latitude, curr_longitude, object_list[i]._source);
+    } else {
+      drop_marker_grey(curr_latitude, curr_longitude, object_list[i]._source)
+    }
 	}
     /*
         markerCluster = new MarkerClusterer(map, marker_list,
         {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 	*/
 }
+
+function drop_marker_grey(latitude, longitude, source_object) {
+  var location = {lat: latitude, lng: longitude};
+  var markerColor = 'C0C0C0';
+  var markerImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + markerColor,
+        new google.maps.Size(80, 400),
+        new google.maps.Point(0,0),
+        new google.maps.Point(10, 34));
+  // Marker Image now contains the green marker with appropriate size
+
+  var new_marker = new google.maps.Marker({
+      position: location,
+      map: map,
+      icon: markerImage
+    });
+    new_marker.addListener('click', function() {
+      toggleMarker(source_object);
+      infowindow.open(map, new_marker);
+    });
+    marker_list.push(new_marker);
+
+ }
+
 
 function drop_marker(latitude, longitude, source_object) {
 	var curr_lat_and_lng = {lat: latitude, lng: longitude};
@@ -45,23 +75,27 @@ function drop_marker(latitude, longitude, source_object) {
 }
 
 //
-// function drop_marker_green_sentiment(latitude, longitude, source_object) {
-// 	var curr_lat_and_lng = {lat: latitude, lng: longitude};
-// 	var markerColor = '3AA91E';
-//     var markerImage = new google.maps.MarkerImage(
-//         "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + markerColor,
-// 	var new_marker = new google.maps.Marker({
-//     	position: curr_lat_and_lng,
-//     	map: map,
-// 		icon: markerImage
-//   	});
-//   	new_marker.addListener('click', function() {
-//   		toggleMarker(source_object);
-//   		infowindow.open(map, new_marker);
-//   	});
-//   	marker_list.push(new_marker);
-//
-// }
+function drop_marker_green_sentiment(latitude, longitude, source_object) {
+ 	var location = {lat: latitude, lng: longitude};
+  var markerColor = '3AA91E';
+  var markerImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + markerColor,
+        new google.maps.Size(80, 400),
+        new google.maps.Point(0,0),
+        new google.maps.Point(10, 34));
+  // Marker Image now contains the green marker with appropriate size
+
+ 	var new_marker = new google.maps.Marker({
+     	position: location,
+     	map: map,
+   		icon: markerImage
+   	});
+  	new_marker.addListener('click', function() {
+  		toggleMarker(source_object);
+  		infowindow.open(map, new_marker);
+   	});
+   	marker_list.push(new_marker);
+
+ }
 
 function placeMarker(location) {
     clearGeoTags();
@@ -92,7 +126,7 @@ function toggleMarker(source_object) {
             '<p>' + source_object.message + '</p>' +
             '<b>' + source_object.author + '</b>' +
             '<p>' + source_object.timestamp + '</p>' +
-			'<p>' + source_object.sentiment + '</p>' +
+			'<b>' + source_object.sentiment + '</b>' +
             '</div>'+
             '</div>';
 	infowindow.setContent(contentString);

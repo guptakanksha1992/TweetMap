@@ -27,6 +27,7 @@ def api_root():
 def searchKeyword(keyword):
     searchTweets = TwitterHandler()
     result = searchTweets.getTweets(keyword)
+    print result
     return jsonify(result)
 
 @application.route('/search/<keyword>/<distance>/<latitude>/<longitude>')
