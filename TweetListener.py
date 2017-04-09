@@ -181,7 +181,7 @@ def elastic_worker_sentiment_analysis():
         message_json['sentiment'] = sentiment
 
         # Publishing to SNS
-        print conn.publish(topic=topic,message = str(message_json))
+        conn.publish(topic=topic,message = json.dumps(message_json), message_structure=json)
         #print "Published to SNS"
     except Exception, e:
         print 'Exception '+ str(e)

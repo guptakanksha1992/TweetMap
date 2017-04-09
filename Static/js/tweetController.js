@@ -92,6 +92,7 @@ function toggleMarker(source_object) {
             '<p>' + source_object.message + '</p>' +
             '<b>' + source_object.author + '</b>' +
             '<p>' + source_object.timestamp + '</p>' +
+			'<p>' + source_object.sentiment + '</p>' +
             '</div>'+
             '</div>';
 	infowindow.setContent(contentString);
@@ -112,7 +113,8 @@ function search_by_geo_distance(latitude, longitude) {
 		url: '/search/' + selected_keyword.value + '/' + selected_distance.value + '/' + latitude + '/' + longitude,
 		type: 'GET',
 		success: function(response) {
-			console.log(JSON.stringify(response));
+			 console.log('This is in .js file!')
+			 console.log(JSON.stringify(response));
 			load_tweet(response);
 		},
 		error: function(error) {

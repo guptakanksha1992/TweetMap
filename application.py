@@ -6,6 +6,7 @@ from flask import Flask, render_template, jsonify, request
 from TweetHandler import TwitterHandler
 import TweetPersister
 import time
+import requests
 
 
 # function that pulls tweets from twitter
@@ -57,17 +58,27 @@ def snsFunction():
         pass 
 
     headers = request.headers.get('X-Amz-Sns-Message-Type')
-    print(notification)
+    # print(notification)
             
     if headers == 'SubscriptionConfirmation' and 'SubscribeURL' in notification:
         url = requests.get(notification['SubscribeURL'])
-        print(url) 
+        # print(url)
     elif headers == 'Notification':
-        print 'Persisting in Elastic BeanStalk'
+        # print 'Persisting in Elastic BeanStalk'
+        # print 'Normal Notification'
+        # print'---------------------'
+        # print notification
+        # print 'Type is :', type(notification)
+        # print '-------------------------'
+        # print 'Json.loads result of notification'
+        # print '---------------------------------'
+        # print (notification['Message'])
+        # print 'Type is :', type((notification['Message']))
+        # print '-------------------------'
         TweetPersister.persistTweet(notification)
         socketio.emit('first', {'notification':'New Tweet!'})
     else: 
-        print 'Value of headers', headers
+        # print 'Value of headers', headers
         print("Headers not specified")
     return 'End point was accessed!'
  
@@ -83,5 +94,5 @@ if __name__ == "__main__":
     twitter_thread.daemon = True
     twitter_thread.start()
     
-    application.run(host = '0.0.0.0', port=5000)
+    application.run()
     #socketio.run(application, host = '0.0.0.0', port=5000)

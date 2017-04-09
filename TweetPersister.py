@@ -51,4 +51,5 @@ def persistTweet(tweet):
     sentiment = json_msg['sentiment']
     
     response = tweeter.insertTweet(tid, location_data, message, author, timestamp, sentiment)
+    # print response
     return response
