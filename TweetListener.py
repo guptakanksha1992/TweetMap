@@ -117,7 +117,7 @@ def parse_data(data):
         formatted_tweet = formatTweet(tweetId, location_data, tweet, author, timestamp)
         tweet = json.dumps(formatted_tweet)
 
-        print 'Trying to publish to Queue the tweet', tweet
+        #print 'Trying to publish to Queue the tweet', tweet
         publishToQueue(tweet)
 
     except Exception, e:
@@ -136,7 +136,7 @@ def publishToQueue(tweet):
 
     try:
         q.write(m)
-        print 'Added to Queue'
+        #print 'Added to Queue'
     except Exception,e:
         print 'Failed to publish to Queue'
         print str(e)
@@ -146,8 +146,8 @@ def elastic_worker_sentiment_analysis():
     # This method acts as an Elastic BeanStalk worker
 
     # Receiving the message from SQS
-    print 'Fetching from SQS and publishing to SNS'
-    print '---------------------------------------'
+    '''print 'Fetching from SQS and publishing to SNS'
+                print '---------------------------------------'''
     try:
         conn = boto.sqs.connect_to_region("us-west-2", aws_access_key_id=myvars['aws_api_key'], aws_secret_access_key=myvars['aws_secret'])
         q = conn.get_queue('tweet_queue')
@@ -162,12 +162,12 @@ def elastic_worker_sentiment_analysis():
         tweet = m.get_body()
 
         sentiment = tweet_sentiment_analysis(tweet)
-        print 'Sentiment processed from tweet_sentiment analysis for tweet'
-        print '----------------------------------------------------------'
-        print tweet
-        print '----------------------------------------------------------'
-        print sentiment
-        print '-------------------'
+        '''print 'Sentiment processed from tweet_sentiment analysis for tweet'
+                                        print '----------------------------------------------------------'
+                                        print tweet
+                                        print '----------------------------------------------------------'
+                                        print sentiment
+                                        print '-------------------'''
 
         # SNS Connection
 
@@ -175,15 +175,14 @@ def elastic_worker_sentiment_analysis():
         topic = 'arn:aws:sns:us-west-2:708464623468:tweet_sentiment'
 
         # Appending sentiment data to JSON Format of the message tweet
-        print 'Value of tweet:', tweet
         
         message_json =  json.loads(tweet)
-        print 'Message_json', message_json
+        #print 'Message_json', message_json
         message_json['sentiment'] = sentiment
 
         # Publishing to SNS
         print conn.publish(topic=topic,message = str(message_json))
-        print "Published to SNS"
+        #print "Published to SNS"
     except Exception, e:
         print 'Exception '+ str(e)
 

@@ -11,7 +11,7 @@ import time
 
 # function that pulls tweets from twitter
 def startTwitterRequests():
-    print 'Fetching tweets at ', str(time.ctime(time.time()))
+    print 'Fetching tweets started at ', str(time.ctime(time.time()))
     startStream()
 
 # EB looks for an 'application' callable by default.
@@ -35,11 +35,21 @@ def searchKeywordWithDistance(keyword, distance, latitude, longitude):
     result = searchTweets.getTweetsWithDistance(keyword, distance, latitude, longitude)
     return jsonify(result)
 
+#---- Flask SocketIO Implementation
+@socketio.on('json')
+def handle_json(json):
+    print('Received json: ' + str(json))
+    send(json, json=True)
+
+
+
 # HTTP Endpoint for SNS
 @application.route('/search/sns', methods = ['GET', 'POST', 'PUT'])
 def snsFunction():
+    print "Request received", request.data
     try:
         # Notification received from SNS
+        print 'Notification received from SNS'
         notification = json.loads(request.data)
     except:
         print("Unable to load request")
@@ -52,6 +62,7 @@ def snsFunction():
         url = requests.get(notification['SubscribeURL'])
         print(url) 
     elif headers == 'Notification':
+        print 'Persisting in Elastic BeanStalk'
         TweetPersister.persistTweet(notification)
         socketio.emit('first', {'notification':'New Tweet!'})
     else: 
@@ -70,4 +81,4 @@ if __name__ == "__main__":
     twitter_thread.start()
     
     application.run()
-    socketio.run(application, host = '0.0.0.0',debug=True, port=5000)
+    #socketio.run(application, host = '0.0.0.0', port=5000)
