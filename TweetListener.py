@@ -175,7 +175,7 @@ def elastic_worker_sentiment_analysis():
         print "Published to SNS"
     except Exception, e:
         print 'Exception '+ str(e)
-    
+
 
 
 def startStream():
