@@ -44,6 +44,25 @@ function drop_marker(latitude, longitude, source_object) {
 
 }
 
+//
+// function drop_marker_green_sentiment(latitude, longitude, source_object) {
+// 	var curr_lat_and_lng = {lat: latitude, lng: longitude};
+// 	var markerColor = '3AA91E';
+//     var markerImage = new google.maps.MarkerImage(
+//         "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + markerColor,
+// 	var new_marker = new google.maps.Marker({
+//     	position: curr_lat_and_lng,
+//     	map: map,
+// 		icon: markerImage
+//   	});
+//   	new_marker.addListener('click', function() {
+//   		toggleMarker(source_object);
+//   		infowindow.open(map, new_marker);
+//   	});
+//   	marker_list.push(new_marker);
+//
+// }
+
 function placeMarker(location) {
     clearGeoTags();
     var markerColor = '0000FF';
@@ -125,6 +144,8 @@ function clearMarkers(){
           marker_list[i].setMap(null);
     }
 }
+
+
 
 function clearGeoTags(){
 	for (var i = 0; i < geo_list.length; i++) {
