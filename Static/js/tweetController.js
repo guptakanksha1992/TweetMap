@@ -18,10 +18,11 @@ function initMap() {
 
 function load_tweet(list) {
 	var object_list = list.hits.hits; 
-	console.log(JSON.stringify(object_list));
+	console.log("Marker code: " +JSON.stringify(object_list));
 	for (var i = 0; i < object_list.length; i++) {
 		curr_latitude = object_list[i]._source.location[1];
 		curr_longitude = object_list[i]._source.location[0];
+		// sentiment filter to call the correct drop marker
 		drop_marker(curr_latitude, curr_longitude, object_list[i]._source);
 	}
     /*
@@ -33,17 +34,9 @@ function load_tweet(list) {
  /* */
 function drop_marker(latitude, longitude, source_object) {
 	var curr_lat_and_lng = {lat: latitude, lng: longitude};
-	var markerColor = '0000FF';
-    var markerImage = new google.maps.MarkerImage(
-        "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + markerColor,
-        new google.maps.Size(80, 400),
-        new google.maps.Point(0,0),
-        new google.maps.Point(10, 34));
 	var new_marker = new google.maps.Marker({
     	position: curr_lat_and_lng,
-    	map: map,
-		title: "Tweets around this area",
-        icon: markerImage
+    	map: map
   	});
   	new_marker.addListener('click', function() {
   		toggleMarker(source_object);
@@ -52,6 +45,25 @@ function drop_marker(latitude, longitude, source_object) {
   	marker_list.push(new_marker);
 
 }
+
+function drop_marker_green_sentiment(latitude, longitude, source_object) {
+	var curr_lat_and_lng = {lat: latitude, lng: longitude};
+	var markerColor = '3AA91E';
+    var markerImage = new google.maps.MarkerImage(
+        "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + markerColor,
+	var new_marker = new google.maps.Marker({
+    	position: curr_lat_and_lng,
+    	map: map,
+		icon: markerImage
+  	});
+  	new_marker.addListener('click', function() {
+  		toggleMarker(source_object);
+  		infowindow.open(map, new_marker);
+  	});
+  	marker_list.push(new_marker);
+
+}
+
 
 function placeMarker(location) {
     clearGeoTags();
@@ -82,6 +94,7 @@ function toggleMarker(source_object) {
             '<p>' + source_object.message + '</p>' +
             '<b>' + source_object.author + '</b>' +
             '<p>' + source_object.timestamp + '</p>' +
+			'<p>' + source_object.sentiment + '</p>' +
             '</div>'+
             '</div>';
 	infowindow.setContent(contentString); 

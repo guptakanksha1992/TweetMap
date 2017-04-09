@@ -1,5 +1,6 @@
 from ElasticSearchServices import ElasticSearchServices
 from TweetHandler import TwitterHandler
+import json
 #---- Elastic Search Details -------
 
 index = "tweettrends"

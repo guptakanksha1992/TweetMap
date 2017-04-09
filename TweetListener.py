@@ -12,6 +12,7 @@ import tweepy
 import json
 from tweepy import Stream
 from tweepy.streaming import StreamListener
+import random
 
 
 consumerKey=myvars['twitter_consumer_key']
@@ -38,15 +39,17 @@ class TweetListener(StreamListener):
     def on_data(self, data):
         try:
             parse_data(data)
+        except Exception, e:
+            print("Parsing Error " + str(e))
+        try:
             elastic_worker_sentiment_analysis()
         except Exception,e:
-            # print(data)
-            print("No location data found" + e)
+            print("Elastic work sentiment Error " + str(e))
 
         return(True)
 
     def on_error(self, status):
-        errorMessage = "Error - Status code " + str(status)
+        errorMessage = "Error - Status code " #+ str(status)
         print(errorMessage)
         if status == REQUEST_LIMIT:
             print("Request limit reached. Trying again...")
@@ -68,7 +71,7 @@ def parse_data(data):
     	json_data_file = json.loads(data)
     except Exception, e:
     	print 'Parsing failed'
-    	print e
+    	print str(e)
     # Could be that json.loads has failed
 
     #print 'JSON DATA FILE:', json_data_file
@@ -78,7 +81,7 @@ def parse_data(data):
         coordinates = json_data_file["coordinates"]
     except Exception,e:
         print 'Location data parsing erroneous'
-        print e
+        print str(e)
 
     # Setting location of the tweet
 
@@ -105,7 +108,7 @@ def parse_data(data):
     author = json_data_file["user"]["name"]
     timestamp = json_data_file["created_at"]
     location_data = [final_longitude, final_latitude]
-
+    tweepy
     # Tweet ready (without sentiment analysis by this point) - sending to queue
    # print tweetId, location_data, tweet, author, timestamp
 
@@ -143,32 +146,37 @@ def elastic_worker_sentiment_analysis():
     # This method acts as an Elastic BeanStalk worker
 
     # Receiving the message from SQS
-    conn = boto.sqs.connect_to_region("us-west-2", aws_access_key_id=myvars['aws_api_key'], aws_secret_access_key=myvars['aws_secret'])
-    q = conn.get_queue('tweet_queue')
+    try:
+        conn = boto.sqs.connect_to_region("us-west-2", aws_access_key_id=myvars['aws_api_key'], aws_secret_access_key=myvars['aws_secret'])
+        q = conn.get_queue('tweet_queue')
 
-    # Storing the result set
-    rs = q.get_messages()
+        # Storing the result set
+        rs = q.get_messages()
 
-    # Extracting the message from resultset
-    m = rs[0]
+        # Extracting the message from resultset
+        m = rs[0]
 
-    # Extracting tweet from message
-    tweet = m.get_body()
+        # Extracting tweet from message
+        tweet = m.get_body()
 
-    sentiment = tweet_sentiment_analysis(tweet)
+        sentiment = tweet_sentiment_analysis(tweet)
 
-    # SNS Connection
+        # SNS Connection
 
-    conn = boto.sns.connect_to_region( 'us-west-2', aws_access_key_id=myvars['aws_api_key'], aws_secret_access_key=myvars['aws_secret'] )
-    topic = 'arn:aws:sns:us-west-2:708464623468:tweet_sentiment'
+        conn = boto.sns.connect_to_region( 'us-west-2', aws_access_key_id=myvars['aws_api_key'], aws_secret_access_key=myvars['aws_secret'] )
+        topic = 'arn:aws:sns:us-west-2:708464623468:tweet_sentiment'
 
-    # Appending sentiment data to JSON Format of the message tweet
-    message_json =  json.loads(m)
-    message_json['sentiment'] = sentiment
+        # Appending sentiment data to JSON Format of the message tweet
+        message_json =  json.loads(m)
+        message_json['sentiment'] = sentiment
 
-    # Publishing to SNS
-    print conn.publish(topic=topic,message = message_json)
-    print "Published to SNS"
+        # Publishing to SNS
+        print conn.publish(topic=topic,message = str(message_json))
+        print "Published to SNS"
+    except Exception, e:
+        print 'Exception '+ str(e)
+    
+
 
 def startStream():
     auth = tweepy.OAuthHandler(consumerKey, consumerSecret)
@@ -176,9 +184,9 @@ def startStream():
     while True:
         try:
             twitterStream = Stream(auth, TweetListener())
-            twitterStream.filter(track=KEYWORDS)
-        except:
-            print("Restarting Stream")
+            twitterStream.filter(languages=['en'], track=KEYWORDS)
+        except Exception, e:
+            print("Restarting Stream" , str(e))
             continue
 
     #The location specified above gets all tweets, we can then filter and store based on what we want

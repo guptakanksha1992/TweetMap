@@ -2,8 +2,10 @@ import json
 import thread
 from flask_socketio import SocketIO, send, emit
 from TweetListener import *
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from TweetHandler import TwitterHandler
+import requests
+import TweetPersister
 
 
 # function that pulls tweets from twitter
@@ -48,7 +50,7 @@ def snsFunction():
         url = requests.get(notification['SubscribeURL'])
         print(url) 
     elif headers == 'Notification':
-        persistTweet(notification)
+        TweetPersister.persistTweet(notification)
         socketio.emit('first', {'notification':'New Tweet!'})
     else: 
         print("Headers not specified")

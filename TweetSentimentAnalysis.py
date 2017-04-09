@@ -19,19 +19,25 @@ natural_language_understanding = NaturalLanguageUnderstandingV1(
     password=wpassword)
 
 def sentimentAnalysis(text):
-    # encoded_text = urllib.quote(text)
-    response = natural_language_understanding.analyze(
-        text=text,
-        features=[features.Emotion(), features.Sentiment()])
-    # print text
-    # emotion_dict = response['emotion']['document']['emotion']
-    overall_sentiment = response['sentiment']['document']['label']
+    try:
+        # Remove unwanted special characters from text
+        correct_text=re.sub('[^a-zA-Z0-9 \n\.]', '', text)
+        # encoded_text = urllib.quote(text)
+        response = natural_language_understanding.analyze(
+            text=correct_text,
+            features=[features.Emotion(), features.Sentiment()])
+        # print text
+        # emotion_dict = response['emotion']['document']['emotion']
+        overall_sentiment = response['sentiment']['document']['label']
 
-    # print ("The overall sentiment of the text is: "+overall_sentiment)
-    # print("The emotional quotient of the text is as follows: ")
-    # for key in emotion_dict:
-    #     print(key + " : " + str(emotion_dict[key]))
-    return overall_sentiment
+        # print ("The overall sentiment of the text is: "+overall_sentiment)
+        # print("The emotional quotient of the text is as follows: ")
+        # for key in emotion_dict:
+        #     print(key + " : " + str(emotion_dict[key]))
+        return overall_sentiment
+
+    except Exception, e:
+        print 'Sentiment API error ' + str(e)
 
 def clean_tweet(tweet):
     '''
