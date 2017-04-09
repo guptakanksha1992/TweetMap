@@ -1,15 +1,17 @@
 import json
-import thread
+import threading
 from flask_socketio import SocketIO, send, emit
 from TweetListener import *
 from flask import Flask, render_template, jsonify, request
 from TweetHandler import TwitterHandler
 import requests
 import TweetPersister
+import time
 
 
 # function that pulls tweets from twitter
 def startTwitterRequests():
+    print 'Fetching tweets at ', str(time.ctime(time.time()))
     startStream()
 
 # EB looks for an 'application' callable by default.
@@ -59,7 +61,13 @@ def snsFunction():
 if __name__ == "__main__":
     # Setting debug to True enables debug output. This line should be
     # removed before deploying a production app.
-    thread.start_new_thread(startTwitterRequests, ())
-    application.debug = True
+    #application.debug = True
+
+    print 'Running application.py'
+
+    twitter_thread = threading.Thread(target=startTwitterRequests)
+    twitter_thread.daemon = True
+    twitter_thread.start()
+    
     application.run()
     socketio.run(application, host = '0.0.0.0',debug=True, port=5000)
