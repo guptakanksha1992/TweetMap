@@ -10,8 +10,8 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 # sentiment analysis watson username and password
-wusername = 'b9d772d4-5e8c-41ca-a571-97abf6136f61'
-wpassword = 'qUlzMi4EImig'
+wusername = 'eb3d45eb-a431-47e6-8c41-04877a15ee11'
+wpassword = 'ijv2uFNSe0j7'
 
 natural_language_understanding = NaturalLanguageUnderstandingV1(
     version='2017-02-27',

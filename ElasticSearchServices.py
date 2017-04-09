@@ -17,7 +17,7 @@ from requests_aws4auth import AWS4Auth
 
 HOSTADDRESS=myvars['elastic_search_host_address']
 
-awsauth = AWS4Auth(myvars['aws_api_key'], myvars['aws_secret'], "us-east-1", 'es')
+awsauth = AWS4Auth(myvars['aws_api_key'], myvars['aws_secret'], "us-west-1", 'es')
 
 class ElasticSearchServices:
 
