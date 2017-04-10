@@ -1,6 +1,5 @@
 import json
 import threading
-from flask_socketio import SocketIO, send, emit
 from TweetListener import *
 from flask import Flask, render_template, jsonify, request
 from TweetHandler import TwitterHandler
@@ -16,7 +15,7 @@ def startTwitterRequests():
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
-socketio = SocketIO(application)
+#socketio = SocketIO(application)
 
 @application.route('/')
 def api_root():
@@ -37,10 +36,10 @@ def searchKeywordWithDistance(keyword, distance, latitude, longitude):
     return jsonify(result)
 
 #---- Flask SocketIO Implementation
-@socketio.on('json')
+'''@socketio.on('json')
 def handle_json(json):
     print('Received json: ' + str(json))
-    send(json, json=True)
+    send(json, json=True)'''
 
 
 
@@ -77,7 +76,7 @@ def snsFunction():
         # print 'Type is :', type((notification['Message']))
         # print '-------------------------'
         TweetPersister.persistTweet(notification)
-        socketio.emit('first', {'notification':'New Tweet!'})
+        #socketio.emit('first', {'notification':'New Tweet!'})
     else: 
         # print 'Value of headers', headers
         print("Headers not specified")
@@ -95,5 +94,5 @@ if __name__ == "__main__":
     twitter_thread.daemon = True
     twitter_thread.start()
     
-    application.run()
+    application.run(host = '0.0.0.0', port=5000)
     #socketio.run(application, host = '0.0.0.0', port=5000)
